@@ -30,3 +30,16 @@ class UserSerializer(serializers.ModelSerializer):
                 user.nickname = validated_data.get('nickname', user.nickname)
         user.save()
         return user
+
+# swagger request body custom serializer    
+class LoginUserSerializer(serializers.Serializer):
+    username = serializers.CharField(help_text="아이디")
+    password = serializers.CharField(help_text="패스워드")
+
+class UserUpdateSerializer(serializers.Serializer):
+    password = serializers.CharField(help_text="패스워드")
+    nickname = serializers.CharField(help_text="닉네임")
+    profile = serializers.ImageField(help_text="프로필이미지")
+
+class RefreshSerializer(serializers.Serializer):
+    refresh_token = serializers.CharField(help_text="refresh_token")

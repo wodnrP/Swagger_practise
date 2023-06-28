@@ -2,16 +2,19 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import exceptions
 from rest_framework.exceptions import APIException, AuthenticationFailed
 from rest_framework.authentication import get_authorization_header
 from .authentication import create_access_token, create_refresh_token, decode_access_token, decode_refresh_token, access_token_exp
-from .serializer import UserSerializer, LoginUserSerializer, UserUpdateSerializer, RefreshSerializer
+from .serializer import UserSerializer, LoginUserSerializer, RefreshSerializer, UserUpdateSerializer
 from .models import User
 from django.utils import timezone
 from rest_framework import permissions
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework.parsers import MultiPartParser
+from .exceptions import status_code_handler
+
 # Create your views here.
 
 # 회원가입 에러 처리
@@ -25,6 +28,12 @@ class LoginException(APIException):
     status_code = 400
     default_detail = '아이디 혹은 비밀번호를 다시 확인해주세요'
     default_code = 'KeyNotFound'
+
+class TokenErrorException(APIException):
+    status_code = 403
+    if status_code == 403:
+        status_code = 401
+    default_detail = 'unauthenticated'
 
 # 로그인시 토큰 생성 함수
 def token_create(user):    
@@ -161,7 +170,7 @@ class UserAPIView(APIView):
                     description="Authorization bearer access_token", 
                     type=openapi.TYPE_STRING
                     )
-                ],
+                ], 
             responses = {
                 200: openapi.Response(
                     description="200 OK",
@@ -174,33 +183,28 @@ class UserAPIView(APIView):
                             }
                         )
                     ),
-                400: 'KeyNotFound',
+                401: 'unauthenticated',
                 500: 'Server Error'
                 }
             )
     def get(self, request, **kwargs):
-        if kwargs.get('id') is None:
-            auth = get_authorization_header(request).split()
-            if auth and len(auth) == 2:
-                user = User.objects.filter(pk=token_decode(auth)).first()
-                return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
-            raise AuthenticationFailed('Unauthenticated')
+        auth = get_authorization_header(request).split()
+        if auth and len(auth) == 2:
+            user = User.objects.filter(pk=token_decode(auth)).first()
             
-        else:
-            user_id = kwargs.get('id')
-            user_serializer = UserSerializer(User.objects.get(pk=user_id))
-            response = Response()
+            user_serializer = UserSerializer(user).data
+            user_id = user_serializer['id']
+            nickname = user_serializer['nickname']
+            profile =  user_serializer['profile']
 
-            user_id = user_serializer.data.get('id')
-            nickname = user_serializer.data.get('nickname')
-            profile =  user_serializer.data.get('profile')
+            response = Response()
             response.data = {
                 'id' : user_id,
                 'nickname' : nickname,
                 'profile' : profile
             }
             return response
-
+        raise TokenErrorException()
     # 유저정보 수정
     @swagger_auto_schema(
             tags=["사용자 정보 수정"],
@@ -218,7 +222,7 @@ class UserAPIView(APIView):
                     description="200 OK",
                     schema=UserSerializer
                     ),
-                400: 'KeyNotFound',
+                401: 'unauthenticated',
                 500: 'Server Error'
                 }
             )

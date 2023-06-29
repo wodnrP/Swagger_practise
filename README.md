@@ -23,6 +23,7 @@ $ pip install -r requirements.txt       프로젝트 패키지 설치
 ```
 
 **.env file create**
+- 프로젝트 폴더와 같은 위치에 .env file 생성
 ```
 DEBUG=...   
 SECRET_KEY=...
@@ -40,4 +41,4 @@ $ python3 manage.py migrate
 $ python3 manage.py runserver
 ```
 
-`/swagger` 를 통해 Swagger UI 확인  
+- `/swagger` 를 통해 Swagger UI 확인  

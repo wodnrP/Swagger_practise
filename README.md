@@ -18,6 +18,7 @@ $ source {your venv name}/bin/activate  가상환경 실행
 ```
 **Installation**
 ```
+$ git clone https://github.com/wodnrP/Swagger_practise.git
 $ pip install -r requirements.txt       프로젝트 패키지 설치 
 ```
 

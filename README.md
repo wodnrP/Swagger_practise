@@ -24,11 +24,19 @@ $ pip install -r requirements.txt       프로젝트 패키지 설치
 
 **.env file create**
 - 프로젝트 폴더와 같은 위치에 .env file 생성
+- https://djecrety.ir/ 에서 django secret_key 생성 후 .env file에 작성
 ```
 DEBUG=...   
 SECRET_KEY=...
 ```
-https://djecrety.ir/ 에서 django secret_key 생성 후 .env file에 작성
+
+**static setting**
+- 프로젝트 폴더와 같은 위치에 static 디렉토리 생성
+- static 디렉토리 하위에 css, image, js 디렉토리 생성
+- 이후 다음과 같은 코드 실행
+```
+$ python3 manage.py collectstatic
+```
 
 **Migration**
 ```

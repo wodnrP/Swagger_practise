@@ -5,6 +5,8 @@
 
 해당 프로젝트는 RD 레시피 저장소 프로젝트의 user app을 copy하여 일부 변경한 프로젝트입니다.
 
+[개인 블로그 참조](https://velog.io/@wodnr_09/Swagger%EC%A0%81%EC%9A%A9)
+
 ---
 
 ### 실행 가이드
